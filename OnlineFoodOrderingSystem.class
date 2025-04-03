@@ -1,0 +1,98 @@
+import java.util.*;
+
+class FoodItem {
+    private String name;
+    private double price;
+
+    public FoodItem(String name, double price) {
+        this.name = name;
+        this.price = price;
+    }
+
+    public String getName() { return name; }
+    public double getPrice() { return price; }
+
+    @Override
+    public String toString() {
+        return name + " - $" + price;
+    }
+}
+
+class Cart {
+    private Map<FoodItem, Integer> items = new HashMap<>();
+    private String specialInstructions = "";
+
+    public void addItem(FoodItem item, int quantity) {
+        items.put(item, items.getOrDefault(item, 0) + quantity);
+        System.out.println(quantity + "x " + item.getName() + " added to cart.");
+    }
+
+    public void setSpecialInstructions(String instructions) {
+        this.specialInstructions = instructions;
+    }
+
+    public void displayCart() {
+        System.out.println("\nYour Cart:");
+        items.forEach((item, quantity) -> 
+            System.out.println(quantity + "x " + item.getName() + " - $" + (item.getPrice() * quantity)));
+        
+        System.out.println("Special Instructions: " + (specialInstructions.isEmpty() ? "None" : specialInstructions));
+    }
+
+    public double calculateTotal(double taxRate, double deliveryFee) {
+        double subtotal = items.entrySet()
+                               .stream()
+                               .mapToDouble(entry -> entry.getKey().getPrice() * entry.getValue())
+                               .sum();
+        double tax = subtotal * taxRate;
+        return subtotal + tax + deliveryFee;
+    }
+}
+
+public class OnlineFoodOrderingSystem {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        List<FoodItem> menu = Arrays.asList(
+            new FoodItem("Pizza", 10.99),
+            new FoodItem("Burger", 5.99),
+            new FoodItem("Pasta", 7.99),
+            new FoodItem("Soda", 1.99)
+        );
+
+        Cart cart = new Cart();
+
+        while (true) {
+            System.out.println("\nFood Menu:");
+            for (int i = 0; i < menu.size(); i++) {
+                System.out.println((i + 1) + ". " + menu.get(i));
+            }
+            System.out.println("0. Checkout");
+
+            System.out.print("Select an item (by number) or 0 to Checkout: ");
+            int choice = scanner.nextInt();
+            if (choice == 0) break;
+
+            if (choice < 1 || choice > menu.size()) {
+                System.out.println("Invalid choice. Try again.");
+                continue;
+            }
+
+            FoodItem selectedItem = menu.get(choice - 1);
+            System.out.print("Enter quantity: ");
+            int quantity = scanner.nextInt();
+            cart.addItem(selectedItem, quantity);
+        }
+
+        scanner.nextLine();  
+        System.out.print("Any special instructions? ");
+        cart.setSpecialInstructions(scanner.nextLine());
+
+        cart.displayCart();
+        
+        double total = cart.calculateTotal(0.08, 3.50); 
+        System.out.printf("\nTotal Amount (incl. taxes & delivery): $%.2f%n", total);
+        System.out.println("Order placed successfully!");
+
+        scanner.close();
+    }
+}
