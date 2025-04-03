@@ -1,0 +1,32 @@
+import java.util.Scanner;
+import java.util.function.Function;
+
+public class EmployeeSalaryCalculator {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter hourly rate: ");
+        double hourlyRate = scanner.nextDouble();
+
+        System.out.print("Enter hours worked: ");
+        double hoursWorked = scanner.nextDouble();
+
+        Function<Double, Double> calculateSalary = (hours) -> {
+            double regularHours = Math.min(hours, 40);
+            double overtimeHours = Math.max(0, hours - 40);
+
+            double regularPay = regularHours * hourlyRate;
+            double overtimePay = overtimeHours * hourlyRate * 1.5;
+
+            return regularPay + overtimePay;
+        };
+
+        double totalSalary = calculateSalary.apply(hoursWorked);
+        double salaryAfterTax = totalSalary * 0.90; // Deducting 10% tax
+
+        System.out.printf("Total Salary: $%.2f%n", totalSalary);
+        System.out.printf("Salary after Tax Deduction: $%.2f%n", salaryAfterTax);
+
+        scanner.close();
+    }
+}
